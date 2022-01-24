@@ -9,21 +9,11 @@ import { ConfigurationPanel } from "./features/configurationPanel/configurationP
 function App(): JSX.Element {
     const renderRoutes: JSX.Element[] = [];
     routes.forEach((route) => {
-        if (route.subroutes) {
-            route.subroutes.forEach((subroute) => {
-                renderRoutes.push(
-                    <Route exact key={subroute.id} path={subroute.path}>
-                        {subroute.component ? <subroute.component /> : <></>}
-                    </Route>
-                );
-            });
-        } else {
-            renderRoutes.push(
-                <Route exact key={route.id} path={route.path}>
-                    {route.component ? <route.component /> : <></>}
-                </Route>
-            );
-        }
+        renderRoutes.push(
+            <Route exact key={route.id} path={route.path}>
+                {route.component ? <route.component /> : <></>}
+            </Route>
+        );
     });
     return (
         <React.Fragment>
