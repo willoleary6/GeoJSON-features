@@ -1,0 +1,21 @@
+{
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "editor.formatOnSave": true,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4,
+    "eslint.validate": [
+        "typescript",
+        "typescriptreact"
+    ],
+    "eslint.workingDirectories": [
+        "GeoJSON-features"
+    ],
+    "files.eol": "\n",
+    "jest.jestCommandLine": "npm test --",
+    "jest.rootPath": "GeoJSON-features/src/"
+}
