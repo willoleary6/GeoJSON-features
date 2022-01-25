@@ -1,11 +1,11 @@
 import React from "react";
 import { Switch, Route } from "react-router-dom";
 
-import { SideNavbar } from "./features/sideNavbar/SideNavbar";
-import { TopNavbar } from "./features/topNavbar/TopNavbar";
+import { SideNavbar } from "./features/SideNavbar";
+import { TopNavbar } from "./features/TopNavbar";
 import { routes } from "./routes/routes";
-import { Footer } from "./features/footer/footer";
-import { ConfigurationPanel } from "./features/configurationPanel/configurationPanel";
+import { Footer } from "./features/Footer";
+import { ConfigurationPanel } from "./features/ConfigurationPanel";
 function App(): JSX.Element {
     const renderRoutes: JSX.Element[] = [];
     routes.forEach((route) => {

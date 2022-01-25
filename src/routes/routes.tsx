@@ -1,5 +1,5 @@
 import React from "react";
-import { GeoJsonDashboard } from "./geoJsonDashboard/geoJsonDashboard";
+import { GeoJsonDashboard } from "./GeoJsonDashboard";
 /**
  * Route information
  *

@@ -1,6 +1,5 @@
 import React from "react";
 import { Route } from "../../routes/routes";
-import { CollapsingSideNavbarItem } from "./CollapsingSideNavbarItem";
 
 import { SideNavbarItem } from "./SideNavbarItem";
 
@@ -16,16 +15,7 @@ export const SideNavbar = ({ routes }: SideNavbarProps): JSX.Element => {
             <div className="sidebar-collapse">
                 <ul className="nav metismenu" id="side-menu">
                     {routes.map((route) => {
-                        if (route.subroutes) {
-                            return (
-                                <CollapsingSideNavbarItem
-                                    key={route.id}
-                                    route={route}
-                                ></CollapsingSideNavbarItem>
-                            );
-                        } else {
-                            return <SideNavbarItem key={route.id} route={route}></SideNavbarItem>;
-                        }
+                        return <SideNavbarItem key={route.id} route={route}></SideNavbarItem>;
                     })}
                 </ul>
             </div>

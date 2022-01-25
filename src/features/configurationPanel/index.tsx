@@ -1,8 +1,9 @@
 import React from "react";
 import { useRef } from "react";
 import { useAppSelector } from "../../app/hooks";
-import "./configurationPanel.css";
+import "./ConfigurationPanel.css";
 import { selectConfiguration } from "../../slices/configurationSlice";
+
 export const ConfigurationPanel = (): JSX.Element => {
     const configSettings = useAppSelector(selectConfiguration);
     const themeConfigBox = useRef<HTMLDivElement>(null);

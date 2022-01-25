@@ -7,10 +7,10 @@ import "./style/additionalStyles.css";
 
 import React from "react";
 import ReactDOM from "react-dom";
-import App from "./App";
+import App from "./app";
 import { store } from "./app/store";
 import { Provider } from "react-redux";
-import * as serviceWorker from "./serviceWorker";
+import * as serviceWorker from "./ServiceWorker";
 import { BrowserRouter as Router } from "react-router-dom";
 
 ReactDOM.render(

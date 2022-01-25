@@ -1,12 +1,12 @@
 import React from "react";
 import Card from "react-bootstrap/Card";
-import { LoadingSpinner } from "../loadingSpinner/loadingSpinner";
+import { LoadingSpinner } from "../LoadingSpinner";
 
-export const GeoJsonData = (): JSX.Element => {
+export const GeoMap = (): JSX.Element => {
     return (
         <Card>
             <Card.Body>
-                <Card.Title>Geo Json</Card.Title>
+                <Card.Title>Geo Map</Card.Title>
                 <LoadingSpinner />
             </Card.Body>
         </Card>
