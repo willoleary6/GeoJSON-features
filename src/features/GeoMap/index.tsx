@@ -1,13 +1,13 @@
 import React from "react";
 import Card from "react-bootstrap/Card";
-import { LoadingSpinner } from "../LoadingSpinner";
+import { MapWidget } from "../MapWidget";
 
 export const GeoMap = (): JSX.Element => {
     return (
         <Card>
             <Card.Body>
                 <Card.Title>Geo Map</Card.Title>
-                <LoadingSpinner />
+                <MapWidget />
             </Card.Body>
         </Card>
     );

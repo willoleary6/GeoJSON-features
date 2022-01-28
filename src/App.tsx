@@ -5,7 +5,6 @@ import { SideNavbar } from "./features/SideNavbar";
 import { TopNavbar } from "./features/TopNavbar";
 import { routes } from "./routes/routes";
 import { Footer } from "./features/Footer";
-import { ConfigurationPanel } from "./features/ConfigurationPanel";
 function App(): JSX.Element {
     const renderRoutes: JSX.Element[] = [];
     routes.forEach((route) => {
@@ -25,7 +24,6 @@ function App(): JSX.Element {
                     <Footer></Footer>
                 </div>
             </div>
-            <ConfigurationPanel></ConfigurationPanel>
         </React.Fragment>
     );
 }

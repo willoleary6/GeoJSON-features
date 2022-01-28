@@ -1,9 +1,8 @@
 import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
-import configurationReducer from "../slices/configurationSlice";
-
+import GeoMapSlice from "../slices/GeoMapSlice";
 export const store = configureStore({
     reducer: {
-        configuration: configurationReducer,
+        geoMap: GeoMapSlice,
     },
     middleware: (getDefaultMiddleware) => {
         return [...getDefaultMiddleware()];
