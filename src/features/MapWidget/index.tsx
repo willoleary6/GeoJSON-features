@@ -1,4 +1,5 @@
-import React, { useState, ChangeEvent, useEffect } from "react";
+import { LatLngBounds } from "leaflet";
+import React from "react";
 import { MapContainer, TileLayer, useMapEvents, useMap } from "react-leaflet";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
@@ -12,6 +13,7 @@ import {
     updateSouthEastCoordinates,
     updateSouthWestCoordinates,
 } from "../../slices/GeoMapSlice";
+import { CoordinateDisplay } from "./CoordinateDisplay";
 import { CoordinateInput } from "./CoordinateInput";
 import "./MapWidget.css";
 
@@ -19,24 +21,46 @@ export const MapWidget = (): JSX.Element => {
     const geoMapSlice = useAppSelector(selectGeoMap);
     const dispatch = useAppDispatch();
 
-    const latOnChange = (event: ChangeEvent<HTMLInputElement>) => {
-        console.log(event.target.value);
-        let newLatitude = parseFloat(event.target.value);
-        console.log(newLatitude);
-        if (Number.isNaN(newLatitude)) {
-            newLatitude = 0;
-        }
-        //dispatch(updateCentreLatitude(newLatitude));
-        //moveMapOnStateChange();
+    const updateCornerCoordinates = (bounds: LatLngBounds) => {
+        const northEastCoordinates = bounds.getNorthEast();
+        const southWestCoordinates = bounds.getSouthWest();
+        const northWestCoordinates = bounds.getNorthWest();
+        const southEastCoordinates = bounds.getSouthEast();
+        dispatch(
+            updateNorthWestCoordinates({
+                lat: northWestCoordinates.lat,
+                lng: northWestCoordinates.lng,
+            })
+        );
+        dispatch(
+            updateNorthEastCoordinates({
+                lat: northEastCoordinates.lat,
+                lng: northEastCoordinates.lng,
+            })
+        );
+        dispatch(
+            updateSouthWestCoordinates({
+                lat: southWestCoordinates.lat,
+                lng: southWestCoordinates.lng,
+            })
+        );
+        dispatch(
+            updateSouthEastCoordinates({
+                lat: southEastCoordinates.lat,
+                lng: southEastCoordinates.lng,
+            })
+        );
     };
 
-    const lngOnChange = (event: ChangeEvent<HTMLInputElement>) => {
-        let newLongitude = parseFloat(event.target.value);
-        if (Number.isNaN(newLongitude)) {
-            newLongitude = 0;
-        }
-        //dispatch(updateCentreLongitude(newLongitude));
-        //moveMapOnStateChange();
+    const searchForCoordinates = (latitude: number, longitude: number) => {
+        dispatch(enableReduxInducedMapMovements());
+        dispatch(
+            updateCentreCoordinates({
+                lat: latitude,
+                lng: longitude,
+            })
+        );
+        dispatch(disableReduxInducedMapMovements());
     };
     const Markers = () => {
         useMapEvents({
@@ -47,6 +71,7 @@ export const MapWidget = (): JSX.Element => {
             dragstart() {
                 dispatch(disableReduxInducedMapMovements());
             },
+
             move(moveEvent) {
                 dispatch(
                     updateCentreCoordinates({
@@ -54,41 +79,7 @@ export const MapWidget = (): JSX.Element => {
                         lng: moveEvent.target.getCenter().lng,
                     })
                 );
-                const bounds = moveEvent.target.getBounds();
-                const northEastCoordinates = bounds["_northEast"];
-                const southWestCoordinates = bounds["_southWest"];
-                const northWestCoordinates = {
-                    lat: northEastCoordinates.lat,
-                    lng: southWestCoordinates.lng,
-                };
-                const southEastCoordinates = {
-                    lat: southWestCoordinates.lat,
-                    lng: northEastCoordinates.lng,
-                };
-                dispatch(
-                    updateNorthWestCoordinates({
-                        lat: northWestCoordinates.lat,
-                        lng: northWestCoordinates.lng,
-                    })
-                );
-                dispatch(
-                    updateNorthEastCoordinates({
-                        lat: northEastCoordinates.lat,
-                        lng: northEastCoordinates.lng,
-                    })
-                );
-                dispatch(
-                    updateSouthWestCoordinates({
-                        lat: southWestCoordinates.lat,
-                        lng: southWestCoordinates.lng,
-                    })
-                );
-                dispatch(
-                    updateSouthEastCoordinates({
-                        lat: southEastCoordinates.lat,
-                        lng: southEastCoordinates.lng,
-                    })
-                );
+                updateCornerCoordinates(moveEvent.target.getBounds());
             },
         });
         return null;
@@ -107,15 +98,18 @@ export const MapWidget = (): JSX.Element => {
                 crossOrigin=""
             ></script>
             <div className="map-element-row">
-                <CoordinateInput
+                <CoordinateInput searchForCoordinates={searchForCoordinates} />
+            </div>
+            <div className="map-element-row">
+                <CoordinateDisplay
                     coordinates={geoMapSlice.northWestCoordinates}
-                    inputClassName="latitude-value-container"
-                    coordinateName="Latitude"
+                    displayClassName="latitude-value-container"
+                    coordinateRounding={5}
                 />
-                <CoordinateInput
+                <CoordinateDisplay
                     coordinates={geoMapSlice.northEastCoordinates}
-                    inputClassName="longitude-value-container"
-                    coordinateName="Longitude"
+                    displayClassName="longitude-value-container"
+                    coordinateRounding={5}
                 />
             </div>
             <div id="map">
@@ -125,6 +119,9 @@ export const MapWidget = (): JSX.Element => {
                     zoom={13}
                     scrollWheelZoom={false}
                     className="leaflet-map-container"
+                    whenCreated={(map) => {
+                        updateCornerCoordinates(map.getBounds());
+                    }}
                 >
                     <Markers />
                     <TileLayer
@@ -138,15 +135,15 @@ export const MapWidget = (): JSX.Element => {
                 </MapContainer>
             </div>
             <div className="map-element-row">
-                <CoordinateInput
+                <CoordinateDisplay
                     coordinates={geoMapSlice.southWestCoordinates}
-                    inputClassName="latitude-value-container"
-                    coordinateName="Latitude"
+                    displayClassName="latitude-value-container"
+                    coordinateRounding={5}
                 />
-                <CoordinateInput
+                <CoordinateDisplay
                     coordinates={geoMapSlice.southEastCoordinates}
-                    inputClassName="longitude-value-container"
-                    coordinateName="Longitude"
+                    displayClassName="longitude-value-container"
+                    coordinateRounding={5}
                 />
             </div>
         </>
@@ -162,10 +159,11 @@ const ChangeMapView = ({ latitude, longitude }: coordinateProps): JSX.Element =>
     const map = useMap();
     const mapCentre = map.getCenter();
     if (
-        (mapCentre.lat != geoMapSlice.latitude || mapCentre.lng != geoMapSlice.longitude) &&
+        (mapCentre.lat != geoMapSlice.centreCoordinates.lat ||
+            mapCentre.lng != geoMapSlice.centreCoordinates.lng) &&
         geoMapSlice.canInduceMapMovements
     ) {
-        map.setView([latitude, longitude], map.getZoom());
+        map.panTo([latitude, longitude]);
     }
     return <></>;
 };

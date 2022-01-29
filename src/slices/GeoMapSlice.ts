@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../app/store";
 
 export interface coordinates {
@@ -7,8 +7,6 @@ export interface coordinates {
 }
 
 export interface GeoMapState {
-    latitude: number;
-    longitude: number;
     canInduceMapMovements: boolean;
     centreCoordinates: coordinates;
     northWestCoordinates: coordinates;
@@ -18,8 +16,6 @@ export interface GeoMapState {
 }
 
 const initialState: GeoMapState = {
-    latitude: 52.52437,
-    longitude: 13.41053,
     canInduceMapMovements: true,
 
     centreCoordinates: { lat: 52.52437, lng: 13.41053 },
@@ -108,7 +104,6 @@ export const geoMapSlice = createSlice({
             .addCase(updateSouthEastCoordinates.fulfilled, (GeoMapState, action) => {
                 GeoMapState.southEastCoordinates = action.payload;
             })
-
             .addCase(disableReduxInducedMapMovements.fulfilled, (GeoMapState, action) => {
                 GeoMapState.canInduceMapMovements = action.payload;
             })
