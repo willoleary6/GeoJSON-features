@@ -29,7 +29,14 @@ export const fetchOpenStreetData = createAsyncThunk(
     "geoMap/fetchOpenStreetData",
     async (args: null, { getState }) => {
         const state = getState() as GeoMapState;
-
+        const left = state.northWestCoordinates.lng.toString();
+        console.log(left);
+        /*
+        const bottom = state.southWestCoordinates.lat.toString();
+        const right = state.northEastCoordinates.lng.toString();
+        const top = state.northEastCoordinates.lat.toString();
+        */
+        /*
         const url =
             "https://www.openstreetmap.org/api/0.6/map?bbox=" +
             state.northWestCoordinates.lng.toString() +
@@ -48,7 +55,8 @@ export const fetchOpenStreetData = createAsyncThunk(
             console.log("rec");
             console.log(response);
         });
-        console.log(test);
+        */
+        console.log(state);
         return null;
     }
 );
