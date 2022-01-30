@@ -1,5 +1,5 @@
 import { LatLngBounds } from "leaflet";
-import React from "react";
+import React, { useEffect } from "react";
 import { MapContainer, TileLayer, useMapEvents, useMap } from "react-leaflet";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
@@ -52,21 +52,23 @@ export const MapWidget = (): JSX.Element => {
         );
     };
 
-    const searchForCoordinates = (latitude: number, longitude: number) => {
-        dispatch(enableReduxInducedMapMovements());
-        dispatch(
+    const searchForCoordinates = async (latitude: number, longitude: number) => {
+        await dispatch(enableReduxInducedMapMovements());
+        await dispatch(
             updateCentreCoordinates({
                 lat: latitude,
                 lng: longitude,
             })
         );
-        dispatch(disableReduxInducedMapMovements());
+        await dispatch(disableReduxInducedMapMovements());
+        await dispatch(fetchOpenStreetData(null));
     };
     const Markers = () => {
         useMapEvents({
             dragend() {
                 dispatch(enableReduxInducedMapMovements());
-                dispatch(fetchOpenStreetData());
+
+                dispatch(fetchOpenStreetData(null));
             },
             dragstart() {
                 dispatch(disableReduxInducedMapMovements());
@@ -158,6 +160,7 @@ const ChangeMapView = ({ latitude, longitude }: coordinateProps): JSX.Element =>
     const geoMapSlice = useAppSelector(selectGeoMap);
     const map = useMap();
     const mapCentre = map.getCenter();
+
     if (
         (mapCentre.lat != geoMapSlice.centreCoordinates.lat ||
             mapCentre.lng != geoMapSlice.centreCoordinates.lng) &&
