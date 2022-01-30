@@ -28,24 +28,22 @@ export const initialState: GeoMapState = {
 export const fetchOpenStreetData = createAsyncThunk(
     "geoMap/fetchOpenStreetData",
     async (args: null, { getState }) => {
-        const state = getState() as GeoMapState;
-        const left = state.northWestCoordinates.lng.toString();
-        console.log(left);
-        /*
-        const bottom = state.southWestCoordinates.lat.toString();
-        const right = state.northEastCoordinates.lng.toString();
-        const top = state.northEastCoordinates.lat.toString();
-        */
-        /*
+        const state = getState() as { geoMap: GeoMapState };
+
+        const left = state.geoMap.northWestCoordinates.lng.toFixed(12).toString();
+        const bottom = state.geoMap.southWestCoordinates.lat.toFixed(12).toString();
+        const right = state.geoMap.northEastCoordinates.lng.toFixed(12).toString();
+        const top = state.geoMap.northEastCoordinates.lat.toFixed(12).toString();
+
         const url =
             "https://www.openstreetmap.org/api/0.6/map?bbox=" +
-            state.northWestCoordinates.lng.toString() +
+            left +
             "," +
-            state.southWestCoordinates.lat.toString() +
+            bottom +
             "," +
-            state.northEastCoordinates.lng.toString() +
+            right +
             "," +
-            state.northEastCoordinates.lat.toString();
+            top;
 
         console.log(url);
         const test = await fetch(url).then((response) => {
@@ -55,7 +53,6 @@ export const fetchOpenStreetData = createAsyncThunk(
             console.log("rec");
             console.log(response);
         });
-        */
         console.log(state);
         return null;
     }
