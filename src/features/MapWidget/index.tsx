@@ -1,6 +1,6 @@
 import { LatLngBounds } from "leaflet";
 import React, { useEffect } from "react";
-import { MapContainer, TileLayer, useMapEvents, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, useMapEvents, useMap, GeoJSON } from "react-leaflet";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
     disableReduxInducedMapMovements,
@@ -73,6 +73,9 @@ export const MapWidget = (): JSX.Element => {
             dragstart() {
                 dispatch(disableReduxInducedMapMovements());
             },
+            zoomend() {
+                dispatch(fetchOpenStreetData(null));
+            },
 
             move(moveEvent) {
                 dispatch(
@@ -130,6 +133,7 @@ export const MapWidget = (): JSX.Element => {
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
+
                     <ChangeMapView
                         latitude={geoMapSlice.centreCoordinates.lat}
                         longitude={geoMapSlice.centreCoordinates.lng}

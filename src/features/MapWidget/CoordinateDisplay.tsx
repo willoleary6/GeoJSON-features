@@ -15,10 +15,8 @@ export const CoordinateDisplay = ({
     return (
         <>
             <div className={displayClassName}>
-                <p className={"longitude-latitude-titlebox"}>
-                    {coordinates.lat.toFixed(coordinateRounding)},{" "}
-                    {coordinates.lng.toFixed(coordinateRounding)}
-                </p>
+                <p className={"longitude-latitude-titlebox"}>Lat: {coordinates.lat}</p>
+                <p className={"longitude-latitude-titlebox"}>Lng: {coordinates.lng}</p>
             </div>
         </>
     );

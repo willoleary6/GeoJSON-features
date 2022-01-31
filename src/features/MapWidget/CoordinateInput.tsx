@@ -96,6 +96,7 @@ export const CoordinateInput = ({ searchForCoordinates }: CoordinateInputProps):
     return (
         <>
             <div className={"coordinate-input-container"}>
+                <div className="coordinate-input-controls"></div>
                 <div className="coordinate-input-controls">
                     <input
                         onKeyUp={enterKeyPressed}
@@ -108,6 +109,7 @@ export const CoordinateInput = ({ searchForCoordinates }: CoordinateInputProps):
                         🔍
                     </button>
                 </div>
+                <div className="coordinate-input-controls"></div>
                 {displayErrorMessageIfNeeded()}
             </div>
         </>

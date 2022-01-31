@@ -1,10 +1,25 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { useAppSelector } from "../app/hooks";
 import { RootState, store } from "../app/store";
+import osmtogeojson from "osmtogeojson";
 
 export interface coordinates {
     lat: number;
     lng: number;
+}
+
+export interface failedOpenStreetApiRequestResponse {
+    message: string;
+    errorCode: number;
+}
+
+export interface GeoJSON {
+    data: {
+        type: string;
+        geometry: {
+            type: string;
+            coordinates: Array<Array<number>> | Array<Array<Array<number>>>;
+        };
+    };
 }
 
 export interface GeoMapState {
@@ -14,15 +29,26 @@ export interface GeoMapState {
     northEastCoordinates: coordinates;
     southWestCoordinates: coordinates;
     southEastCoordinates: coordinates;
+    geoJsonData: GeoJSON;
 }
 
 export const initialState: GeoMapState = {
     canInduceMapMovements: true,
-    centreCoordinates: { lat: 52.52437, lng: 13.41053 },
+    centreCoordinates: { lat: 52.366130473786406, lng: -9.729074740570002 },
     northWestCoordinates: { lat: 0, lng: 0 },
     northEastCoordinates: { lat: 0, lng: 0 },
     southWestCoordinates: { lat: 0, lng: 0 },
     southEastCoordinates: { lat: 0, lng: 0 },
+
+    geoJsonData: {
+        data: {
+            type: "",
+            geometry: {
+                type: "",
+                coordinates: [[0, 0]],
+            },
+        },
+    },
 };
 
 export const fetchOpenStreetData = createAsyncThunk(
@@ -45,16 +71,15 @@ export const fetchOpenStreetData = createAsyncThunk(
             "," +
             top;
 
-        console.log(url);
-        const test = await fetch(url).then((response) => {
-            if (!response.ok) {
-                throw new Error(response.statusText);
-            }
-            console.log("rec");
-            console.log(response);
+        const response = await fetch(url, {
+            // learn more about this API here: https://graphql-pokemon2.vercel.app/
+            method: "GET",
+        }).then((response) => {
+            return response.text();
         });
-        console.log(state);
-        return null;
+        const parser = new DOMParser().parseFromString(response, "application/xml");
+        console.log(osmtogeojson(parser));
+        return osmtogeojson(parser);
     }
 );
 
@@ -84,6 +109,14 @@ export const geoMapSlice = createSlice({
         enableReduxInducedMapMovements: (GeoMapState) => {
             GeoMapState.canInduceMapMovements = true;
         },
+    },
+    extraReducers: (builder) => {
+        builder.addCase(fetchOpenStreetData.fulfilled, (GeoMapState, action) => {
+            //GeoMapState.geoJsonData.data.type = action.payload.features[0].type;
+            //GeoMapState.geoJsonData.data.geometry.type = action.payload.features[0].geometry.type;
+            //GeoMapState.geoJsonData.data.geometry.coordinates = action.payload.features[0].geometry.coordinates;
+            //GeoMapState.geoJsonData.data = action.payload.features[0];
+        });
     },
 });
 
