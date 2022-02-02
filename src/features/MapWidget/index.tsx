@@ -16,11 +16,11 @@ import {
 import { CoordinateDisplay } from "./CoordinateDisplay";
 import { CoordinateInput } from "./CoordinateInput";
 import "./MapWidget.css";
+import osmtogeojson from "osmtogeojson";
 
 export const MapWidget = (): JSX.Element => {
     const geoMapSlice = useAppSelector(selectGeoMap);
     const dispatch = useAppDispatch();
-
     const updateCornerCoordinates = (bounds: LatLngBounds) => {
         const northEastCoordinates = bounds.getNorthEast();
         const southWestCoordinates = bounds.getSouthWest();
@@ -121,7 +121,7 @@ export const MapWidget = (): JSX.Element => {
                 <div id="crosshair">(+)</div>
                 <MapContainer
                     center={[geoMapSlice.centreCoordinates.lat, geoMapSlice.centreCoordinates.lng]}
-                    zoom={13}
+                    zoom={15}
                     scrollWheelZoom={false}
                     className="leaflet-map-container"
                     whenCreated={(map) => {
@@ -133,6 +133,10 @@ export const MapWidget = (): JSX.Element => {
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
+
+                    {geoMapSlice.geoJsonData.map((element: any, index: number) => {
+                        return <GeoJSON key={element + index} data={element} />;
+                    })}
 
                     <ChangeMapView
                         latitude={geoMapSlice.centreCoordinates.lat}
@@ -155,7 +159,11 @@ export const MapWidget = (): JSX.Element => {
         </>
     );
 };
+/*
 
+import osmtogeojson from "osmtogeojson";
+console.log(osmtogeojson(parser));
+*/
 interface coordinateProps {
     latitude: number;
     longitude: number;

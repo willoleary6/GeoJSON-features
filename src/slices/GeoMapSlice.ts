@@ -1,25 +1,45 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState, store } from "../app/store";
 import osmtogeojson from "osmtogeojson";
+import { couldStartTrivia } from "typescript";
 
 export interface coordinates {
     lat: number;
     lng: number;
 }
 
-export interface failedOpenStreetApiRequestResponse {
-    message: string;
-    errorCode: number;
+export interface IProperty {
+    boundary: string;
+    changeset: string;
+    id: string;
+    logainm: string;
+    name: string;
+    source: string;
+    timestamp: string;
+    type: string;
+    uid: string;
+    user: string;
+    version: string;
+}
+export interface IGeometry {
+    type: string;
+    coordinates: [number, number][] | [number, number][][] | [number, number][][][];
 }
 
-export interface GeoJSON {
-    data: {
-        type: string;
-        geometry: {
-            type: string;
-            coordinates: Array<Array<number>> | Array<Array<Array<number>>>;
-        };
-    };
+export interface IGeoJson {
+    type: string;
+    geometry: IGeometry;
+    bbox?: number[];
+    properties?: IProperty;
+}
+
+export class GeoJson implements IGeoJson {
+    constructor(
+        public type: string,
+        public geometry: IGeometry,
+        properties?: IProperty,
+        bbox?: number[]
+    ) {}
 }
 
 export interface GeoMapState {
@@ -29,7 +49,8 @@ export interface GeoMapState {
     northEastCoordinates: coordinates;
     southWestCoordinates: coordinates;
     southEastCoordinates: coordinates;
-    geoJsonData: GeoJSON;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    geoJsonData: any;
 }
 
 export const initialState: GeoMapState = {
@@ -40,15 +61,7 @@ export const initialState: GeoMapState = {
     southWestCoordinates: { lat: 0, lng: 0 },
     southEastCoordinates: { lat: 0, lng: 0 },
 
-    geoJsonData: {
-        data: {
-            type: "",
-            geometry: {
-                type: "",
-                coordinates: [[0, 0]],
-            },
-        },
-    },
+    geoJsonData: [],
 };
 
 export const fetchOpenStreetData = createAsyncThunk(
@@ -77,9 +90,8 @@ export const fetchOpenStreetData = createAsyncThunk(
         }).then((response) => {
             return response.text();
         });
-        const parser = new DOMParser().parseFromString(response, "application/xml");
-        console.log(osmtogeojson(parser));
-        return osmtogeojson(parser);
+
+        return response;
     }
 );
 
@@ -112,10 +124,15 @@ export const geoMapSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(fetchOpenStreetData.fulfilled, (GeoMapState, action) => {
-            //GeoMapState.geoJsonData.data.type = action.payload.features[0].type;
-            //GeoMapState.geoJsonData.data.geometry.type = action.payload.features[0].geometry.type;
-            //GeoMapState.geoJsonData.data.geometry.coordinates = action.payload.features[0].geometry.coordinates;
-            //GeoMapState.geoJsonData.data = action.payload.features[0];
+            //osmtogeojson(
+            if (
+                action.payload !=
+                "You requested too many nodes (limit is 50000). Either request a smaller area, or use planet.osm"
+            ) {
+                const parser = new DOMParser().parseFromString(action.payload, "application/xml");
+                const test = osmtogeojson(parser);
+                GeoMapState.geoJsonData = test.features;
+            }
         });
     },
 });
