@@ -27,7 +27,7 @@ export const initialState: GeoMapState = {
     southWestCoordinates: { lat: 0, lng: 0 },
     southEastCoordinates: { lat: 0, lng: 0 },
 
-    geoJsonData: [],
+    geoJsonData: null,
 };
 
 export const fetchOpenStreetData = createAsyncThunk(
@@ -47,21 +47,25 @@ export const fetchOpenStreetData = createAsyncThunk(
             right +
             "," +
             top;
-
         const response = await fetch(url, {
             method: "GET",
-        }).then((response) => {
-            return response.text();
-        });
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw Error(response.statusText);
+                }
 
-        if (
-            response !=
-            "You requested too many nodes (limit is 50000). Either request a smaller area, or use planet.osm"
-        ) {
+                return response.text();
+            })
+            .catch(() => {
+                return null;
+            });
+
+        if (response != null) {
             const parsedOsmData = new DOMParser().parseFromString(response, "application/xml");
             return osmtogeojson(parsedOsmData).features;
         }
-        return [];
+        return null;
     }
 );
 

@@ -1,5 +1,4 @@
 import React from "react";
-import { GeoJsonData } from "../../features/GeoJsonData";
 import { GeoMap } from "../../features/GeoMap";
 export function GeoJsonDashboard(): JSX.Element {
     return (

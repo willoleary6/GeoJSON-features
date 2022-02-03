@@ -186,7 +186,11 @@ const ChangeMapView = ({ latitude, longitude }: coordinateProps): JSX.Element =>
 
 const RenderGeoJsonData = (): JSX.Element => {
     const geoMapSlice = useAppSelector(selectGeoMap);
-    return geoMapSlice.geoJsonData.map((element: any, index: number) => {
-        return <GeoJSON key={element + index} data={element} />;
-    });
+    if (geoMapSlice.geoJsonData != null) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return geoMapSlice.geoJsonData.map((element: any, index: number) => {
+            return <GeoJSON key={element + index} data={element} />;
+        });
+    }
+    return <></>;
 };

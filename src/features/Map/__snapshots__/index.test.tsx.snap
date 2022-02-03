@@ -13,7 +13,7 @@ exports[`MapWidget render testing renders and takes snapshot to track jsx elemen
     }
   }
 >
-  <MapWidget>
+  <Map>
     <link
       crossOrigin=""
       href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
@@ -36,197 +36,7 @@ exports[`MapWidget render testing renders and takes snapshot to track jsx elemen
         >
           <div
             className="coordinate-input-controls"
-          >
-            <input
-              onChange={[Function]}
-              onKeyUp={[Function]}
-            />
-            <button
-              disabled={true}
-              onClick={[Function]}
-            >
-              🔍
-            </button>
-          </div>
-          <p
-            className="error-message"
           />
-        </div>
-      </CoordinateInput>
-    </div>
-    <div
-      className="map-element-row"
-    >
-      <CoordinateDisplay
-        coordinateRounding={5}
-        coordinates={
-          Object {
-            "lat": 0,
-            "lng": 0,
-          }
-        }
-        displayClassName="latitude-value-container"
-      >
-        <div
-          className="latitude-value-container"
-        >
-          <p
-            className="longitude-latitude-titlebox"
-          >
-            0.00000
-            ,
-             
-            0.00000
-          </p>
-        </div>
-      </CoordinateDisplay>
-      <CoordinateDisplay
-        coordinateRounding={5}
-        coordinates={
-          Object {
-            "lat": 0,
-            "lng": 0,
-          }
-        }
-        displayClassName="longitude-value-container"
-      >
-        <div
-          className="longitude-value-container"
-        >
-          <p
-            className="longitude-latitude-titlebox"
-          >
-            0.00000
-            ,
-             
-            0.00000
-          </p>
-        </div>
-      </CoordinateDisplay>
-    </div>
-    <div
-      id="map"
-    >
-      <div
-        id="crosshair"
-      >
-        (+)
-      </div>
-      <MapContainer
-        center={
-          Array [
-            52.52437,
-            13.41053,
-          ]
-        }
-        className="leaflet-map-container"
-        scrollWheelZoom={false}
-        whenCreated={[Function]}
-        zoom={13}
-      >
-        <div
-          className="leaflet-map-container"
-        >
-          <Markers />
-          <ForwardRef(LeafComponent)
-            attribution="© <a href=\\"https://www.openstreetmap.org/copyright\\">OpenStreetMap</a> contributors"
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          <ChangeMapView
-            latitude={52.52437}
-            longitude={13.41053}
-          />
-        </div>
-      </MapContainer>
-    </div>
-    <div
-      className="map-element-row"
-    >
-      <CoordinateDisplay
-        coordinateRounding={5}
-        coordinates={
-          Object {
-            "lat": 0,
-            "lng": 0,
-          }
-        }
-        displayClassName="latitude-value-container"
-      >
-        <div
-          className="latitude-value-container"
-        >
-          <p
-            className="longitude-latitude-titlebox"
-          >
-            0.00000
-            ,
-             
-            0.00000
-          </p>
-        </div>
-      </CoordinateDisplay>
-      <CoordinateDisplay
-        coordinateRounding={5}
-        coordinates={
-          Object {
-            "lat": 0,
-            "lng": 0,
-          }
-        }
-        displayClassName="longitude-value-container"
-      >
-        <div
-          className="longitude-value-container"
-        >
-          <p
-            className="longitude-latitude-titlebox"
-          >
-            0.00000
-            ,
-             
-            0.00000
-          </p>
-        </div>
-      </CoordinateDisplay>
-    </div>
-  </MapWidget>
-</Provider>
-`;
-
-exports[`MapWidget render testing renders the component, then will update the centre coordinates value, this should cause the map to change location 1`] = `
-<Provider
-  store={
-    Object {
-      "clearActions": [Function],
-      "dispatch": [Function],
-      "getActions": [Function],
-      "getState": [Function],
-      "replaceReducer": [Function],
-      "subscribe": [Function],
-    }
-  }
->
-  <MapWidget>
-    <link
-      crossOrigin=""
-      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-      rel="stylesheet"
-    />
-    <script
-      crossOrigin=""
-      integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
-      src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-    />
-    <div
-      className="map-element-row"
-    >
-      <CoordinateInput
-        searchForCoordinates={[Function]}
-      >
-        <div
-          className="coordinate-input-container"
-        >
           <div
             className="coordinate-input-controls"
           >
@@ -241,6 +51,9 @@ exports[`MapWidget render testing renders the component, then will update the ce
               🔍
             </button>
           </div>
+          <div
+            className="coordinate-input-controls"
+          />
           <p
             className="error-message"
           />
@@ -251,7 +64,6 @@ exports[`MapWidget render testing renders the component, then will update the ce
       className="map-element-row"
     >
       <CoordinateDisplay
-        coordinateRounding={5}
         coordinates={
           Object {
             "lat": 0,
@@ -266,15 +78,18 @@ exports[`MapWidget render testing renders the component, then will update the ce
           <p
             className="longitude-latitude-titlebox"
           >
-            0.00000
-            ,
-             
-            0.00000
+            Lat: 
+            0
+          </p>
+          <p
+            className="longitude-latitude-titlebox"
+          >
+            Lng: 
+            0
           </p>
         </div>
       </CoordinateDisplay>
       <CoordinateDisplay
-        coordinateRounding={5}
         coordinates={
           Object {
             "lat": 0,
@@ -289,10 +104,14 @@ exports[`MapWidget render testing renders the component, then will update the ce
           <p
             className="longitude-latitude-titlebox"
           >
-            0.00000
-            ,
-             
-            0.00000
+            Lat: 
+            0
+          </p>
+          <p
+            className="longitude-latitude-titlebox"
+          >
+            Lng: 
+            0
           </p>
         </div>
       </CoordinateDisplay>
@@ -308,26 +127,27 @@ exports[`MapWidget render testing renders the component, then will update the ce
       <MapContainer
         center={
           Array [
-            52.52437,
-            13.41053,
+            46.81914,
+            9.62556,
           ]
         }
         className="leaflet-map-container"
         scrollWheelZoom={false}
         whenCreated={[Function]}
-        zoom={13}
+        zoom={15}
       >
         <div
           className="leaflet-map-container"
         >
-          <Markers />
+          <MapEventHandlers />
           <ForwardRef(LeafComponent)
             attribution="© <a href=\\"https://www.openstreetmap.org/copyright\\">OpenStreetMap</a> contributors"
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+          <RenderGeoJsonData />
           <ChangeMapView
-            latitude={52.52437}
-            longitude={13.41053}
+            latitude={46.81914}
+            longitude={9.62556}
           />
         </div>
       </MapContainer>
@@ -336,7 +156,6 @@ exports[`MapWidget render testing renders the component, then will update the ce
       className="map-element-row"
     >
       <CoordinateDisplay
-        coordinateRounding={5}
         coordinates={
           Object {
             "lat": 0,
@@ -351,15 +170,18 @@ exports[`MapWidget render testing renders the component, then will update the ce
           <p
             className="longitude-latitude-titlebox"
           >
-            0.00000
-            ,
-             
-            0.00000
+            Lat: 
+            0
+          </p>
+          <p
+            className="longitude-latitude-titlebox"
+          >
+            Lng: 
+            0
           </p>
         </div>
       </CoordinateDisplay>
       <CoordinateDisplay
-        coordinateRounding={5}
         coordinates={
           Object {
             "lat": 0,
@@ -374,14 +196,18 @@ exports[`MapWidget render testing renders the component, then will update the ce
           <p
             className="longitude-latitude-titlebox"
           >
-            0.00000
-            ,
-             
-            0.00000
+            Lat: 
+            0
+          </p>
+          <p
+            className="longitude-latitude-titlebox"
+          >
+            Lng: 
+            0
           </p>
         </div>
       </CoordinateDisplay>
     </div>
-  </MapWidget>
+  </Map>
 </Provider>
 `;

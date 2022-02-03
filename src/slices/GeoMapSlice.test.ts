@@ -11,6 +11,7 @@ import reducer, {
     updateSouthEastCoordinates,
     disableReduxInducedMapMovements,
     enableReduxInducedMapMovements,
+    fetchOpenStreetData,
 } from "./GeoMapSlice";
 
 const middlewares = [thunk];
@@ -37,8 +38,8 @@ describe("Testing the reducers", () => {
     it("tests that the default values for the map on open are as expected", () => {
         const state = store.getState().geoMap;
         const centreCoordinates = state.centreCoordinates;
-        expect(centreCoordinates?.lat).toBe(52.52437);
-        expect(centreCoordinates?.lng).toBe(13.41053);
+        expect(centreCoordinates?.lat).toBe(46.81914);
+        expect(centreCoordinates?.lng).toBe(9.62556);
     });
 
     it("tests to see if centre coordinates reducer is working as expected", () => {
@@ -144,146 +145,223 @@ describe("Testing the reducers", () => {
     });
 });
 
-/*
+global.fetch = jest.fn(() =>
+    Promise.resolve({
+        json: () => Promise.resolve({ ok: true, text: () => "" }),
+    })
+) as jest.Mock;
 
-    // allows us to easily return reponses and/or success/fail for a thunk that calls a service
-const mockServiceCreator =
-    (body: unknown, succeeds = true) =>
-    () =>
-        new Promise((resolve, reject) => {
-            setTimeout(() => (succeeds ? resolve(body) : reject(body)), 10);
-        });
-    it("tests updateCentreCoordinates so that it functions as expected", () => {
-        const newCoordinates = {
-            lat: 0,
-            lng: 0,
+describe("Testing the fetchOpenStreetData thunk", () => {
+    // set up a fake store for all our tests
+    let store = mockStore();
+    beforeEach(() => {
+        const mockState: mockStoreInterface = {
+            geoMap: {
+                canInduceMapMovements: true,
+                centreCoordinates: {
+                    lat: 46.81914,
+                    lng: 9.62556,
+                },
+                northWestCoordinates: {
+                    lat: 46.825817382887145,
+                    lng: 9.613208770751955,
+                },
+                northEastCoordinates: {
+                    lat: 46.825817382887145,
+                    lng: 9.637928009033205,
+                },
+                southWestCoordinates: {
+                    lat: 46.81245534135787,
+                    lng: 9.613208770751955,
+                },
+                southEastCoordinates: {
+                    lat: 46.81245534135787,
+                    lng: 9.637928009033205,
+                },
+                geoJsonData: [],
+            },
         };
-        const state = store.getState().geoMap;
-        // mock dispatch event
-        const response = store.dispatch(updateCentreCoordinates(newCoordinates));
-        const action = { type: updateCentreCoordinates.fulfilled.type, payload: response.arg };
-        const updated_state = reducer(store.getState().geoMap, action);
-
-        const centreCoordinates = updated_state.centreCoordinates;
-        // first lets check that what we wanted to update, worked successfully
-        expect(centreCoordinates.lat).toBe(0);
-        expect(centreCoordinates.lng).toBe(0);
-        /*
-        // now lets check that nothing else was effected
-        const copyOfOrignalState = delete state.centreCoordinates;
-
-        copyOfOrignalState.centreCoordinates.lat = 0;
-        copyOfOrignalState.centreCoordinates.lng = 0;
-
-        expect(copyOfOrignalState).toBe(updated_state);
-        
+        store = mockStore(mockState);
     });
-    
-test('Updates a books author and title', () => {
-  let state = store.getState().book;
-  const unchangedBook = state.bookList.find((book) => book.id === '1');
-  expect(unchangedBook?.title).toBe('1984');
-  expect(unchangedBook?.author).toBe('George Orwell');
+    afterEach(() => {
+        store.clearActions();
+    });
 
-  store.dispatch(updateBook({ id: '1', title: '1985', author: 'George Bush' }));
-  state = store.getState().book;
-  let changeBook = state.bookList.find((book) => book.id === '1');
-  expect(changeBook?.title).toBe('1985');
-  expect(changeBook?.author).toBe('George Bush');
-
-  store.dispatch(updateBook({ id: '1', title: '1984', author: 'George Orwell' }));
-  state = store.getState().book;
-  const backToUnchangedBook = state.bookList.find((book) => book.id === '1');
-
-  expect(backToUnchangedBook).toEqual(unchangedBook);
-});
-
-test('Deletes a book from list with id', () => {
-  let state = store.getState().book;
-  const initialBookCount = state.bookList.length;
-
-  store.dispatch(deleteBook({ id: '1' }));
-  state = store.getState().book;
-
-  expect(state.bookList.length).toBeLessThan(initialBookCount); // Checking if new length smaller than inital length, which is 3
-});
-
-test('Adds a new book', () => {
-  let state = store.getState().book;
-  const initialBookCount = state.bookList.length;
-
-  store.dispatch(addNewBook({ id: '4', author: 'Tester', title: 'Testers manual' }));
-  state = store.getState().book;
-  const newlyAddedBook = state.bookList.find((book) => book.id === '4');
-  expect(newlyAddedBook?.author).toBe('Tester');
-  expect(newlyAddedBook?.title).toBe('Testers manual');
-  expect(state.bookList.length).toBeGreaterThan(initialBookCount);
-});
-
-*/
-
-/*
-    it("tests updateCentreCoordinates so that it functions as expected", async () => {
-        const newCoordinates = {
-            lat: 0,
-            lng: 0,
-        };
-
+    it("tests triggering the fetchOpenStreetData thunk and checking a fetch request was mate  ", async () => {
         // first testing that the thunk execution exits successfully
-        await store.dispatch(updateCentreCoordinates(newCoordinates)).then(() => {
-            const actions = store.getActions();
-            expect(actions[1].type).toEqual("geoMap/updateCentreCoordinates/fulfilled");
+        await store.dispatch(fetchOpenStreetData());
+        expect(fetch).toHaveBeenCalledTimes(1);
+    });
+
+    it("handles exception with null", async () => {
+        const mockFetchPromise = Promise.reject(
+            () =>
+                "You requested too many nodes (limit is 50000). Either request a smaller area, or use planet.osm"
+        );
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const globalRef: any = global;
+        globalRef.fetch = jest.fn().mockImplementation(() => mockFetchPromise);
+        // first testing that the thunk execution exits successfully
+        const test = await store.dispatch(fetchOpenStreetData());
+
+        expect(test.payload).toEqual(null);
+    });
+
+    it("handles exception with null", async () => {
+        const mockFetchPromise = Promise.reject(
+            () =>
+                "You requested too many nodes (limit is 50000). Either request a smaller area, or use planet.osm"
+        );
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const globalRef: any = global;
+        globalRef.fetch = jest.fn().mockImplementation(() => mockFetchPromise);
+        // first testing that the thunk execution exits successfully
+        const test = await store.dispatch(fetchOpenStreetData());
+
+        expect(test.payload).toEqual(null);
+    });
+
+    it("handles valid osm data", async () => {
+        const mockSuccessResponse =
+            '<?xml version="1.0" encoding="UTF-8"?> \
+        <osm version="0.6" generator="CGImap 0.8.6 (1416373 spike-07.openstreetmap.org)" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">\
+            <bounds minlat="52.3559488" minlon="-9.7169351" maxlat="52.3574395" maxlon="-9.7138452"/>\
+            <node id="2251306398" visible="true" version="1" changeset="15625969" timestamp="2013-04-05T22:20:40Z" user="mapryan" uid="51469" lat="52.3545897" lon="-9.7222203"/>\
+            <way id="923136531" visible="true" version="1" changeset="101881651" timestamp="2021-03-28T16:45:08Z" user="eireidium" uid="146307">\
+                <nd ref="8569466237"/>\
+                <nd ref="8569466238"/>\
+                <nd ref="8569466239"/>\
+                <nd ref="8569466240"/>\
+                <nd ref="8569466237"/>\
+                <tag k="building" v="shed"/>\
+            </way>\
+            <relation id="10788035" visible="true" version="49" changeset="116046554" timestamp="2022-01-12T01:54:04Z" user="MacLondon" uid="322039">\
+                <member type="relation" ref="13643256" role=""/>\
+                <member type="relation" ref="12885714" role=""/>\
+                <member type="relation" ref="13502160" role="future"/>\
+                <member type="relation" ref="13519014" role="future"/>\
+                <member type="relation" ref="13519015" role="future"/>\
+                <member type="relation" ref="13502161" role="future"/>\
+                <tag k="colour" v="#003399"/>\
+                <tag k="name" v="EuroVelo 1 - Atlantic Coast Route - Kerry"/>\
+                <tag k="name:en" v="EuroVelo 1 - Atlantic Coast Route - Kerry"/>\
+                <tag k="network" v="icn"/>\
+                <tag k="ref" v="EV1"/>\
+                <tag k="route" v="bicycle"/>\
+                <tag k="type" v="superroute"/>\
+            </relation>\
+        </osm>';
+        const mockJsonPromise = Promise.resolve(mockSuccessResponse);
+        const mockFetchPromise = Promise.resolve({
+            ok: true,
+            text: () => mockJsonPromise,
         });
-        // next we need to test how the reducer handles a success message from the thunk
-        const action = { type: updateCentreCoordinates.fulfilled.type, payload: newCoordinates };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const globalRef: any = global;
+        globalRef.fetch = jest.fn().mockImplementation(() => mockFetchPromise);
+        // first testing that the thunk execution exits successfully
+        const test = await store.dispatch(fetchOpenStreetData());
+
+        expect(test.payload).toEqual(undefined);
+    });
+
+    it("handles valid osm data but ok is false, should throw and error and return null", async () => {
+        const mockSuccessResponse =
+            '<?xml version="1.0" encoding="UTF-8"?> \
+        <osm version="0.6" generator="CGImap 0.8.6 (1416373 spike-07.openstreetmap.org)" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">\
+            <bounds minlat="52.3559488" minlon="-9.7169351" maxlat="52.3574395" maxlon="-9.7138452"/>\
+            <node id="2251306398" visible="true" version="1" changeset="15625969" timestamp="2013-04-05T22:20:40Z" user="mapryan" uid="51469" lat="52.3545897" lon="-9.7222203"/>\
+            <way id="923136531" visible="true" version="1" changeset="101881651" timestamp="2021-03-28T16:45:08Z" user="eireidium" uid="146307">\
+                <nd ref="8569466237"/>\
+                <nd ref="8569466238"/>\
+                <nd ref="8569466239"/>\
+                <nd ref="8569466240"/>\
+                <nd ref="8569466237"/>\
+                <tag k="building" v="shed"/>\
+            </way>\
+            <relation id="10788035" visible="true" version="49" changeset="116046554" timestamp="2022-01-12T01:54:04Z" user="MacLondon" uid="322039">\
+                <member type="relation" ref="13643256" role=""/>\
+                <member type="relation" ref="12885714" role=""/>\
+                <member type="relation" ref="13502160" role="future"/>\
+                <member type="relation" ref="13519014" role="future"/>\
+                <member type="relation" ref="13519015" role="future"/>\
+                <member type="relation" ref="13502161" role="future"/>\
+                <tag k="colour" v="#003399"/>\
+                <tag k="name" v="EuroVelo 1 - Atlantic Coast Route - Kerry"/>\
+                <tag k="name:en" v="EuroVelo 1 - Atlantic Coast Route - Kerry"/>\
+                <tag k="network" v="icn"/>\
+                <tag k="ref" v="EV1"/>\
+                <tag k="route" v="bicycle"/>\
+                <tag k="type" v="superroute"/>\
+            </relation>\
+        </osm>';
+        const mockJsonPromise = Promise.resolve(mockSuccessResponse);
+        const mockFetchPromise = Promise.resolve({
+            ok: false,
+            text: () => mockJsonPromise,
+        });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const globalRef: any = global;
+        globalRef.fetch = jest.fn().mockImplementation(() => mockFetchPromise);
+        // first testing that the thunk execution exits successfully
+        const test = await store.dispatch(fetchOpenStreetData());
+
+        expect(test.payload).toEqual(null);
+    });
+});
+
+describe("Testing how the reducer handles thunks", () => {
+    // set up a fake store for all our tests
+    let store = mockStore();
+    beforeEach(() => {
+        const mockState: mockStoreInterface = {
+            geoMap: {
+                canInduceMapMovements: true,
+                centreCoordinates: {
+                    lat: 46.81914,
+                    lng: 9.62556,
+                },
+                northWestCoordinates: {
+                    lat: 46.825817382887145,
+                    lng: 9.613208770751955,
+                },
+                northEastCoordinates: {
+                    lat: 46.825817382887145,
+                    lng: 9.637928009033205,
+                },
+                southWestCoordinates: {
+                    lat: 46.81245534135787,
+                    lng: 9.613208770751955,
+                },
+                southEastCoordinates: {
+                    lat: 46.81245534135787,
+                    lng: 9.637928009033205,
+                },
+                geoJsonData: [],
+            },
+        };
+        store = mockStore(mockState);
+    });
+    afterEach(() => {
+        store.clearActions();
+    });
+
+    it("handles valid osm data but ok is false, should throw and error and return null", async () => {
+        const sampleJson = [
+            {
+                test: true,
+            },
+        ];
+
+        const action = { type: fetchOpenStreetData.fulfilled.type, payload: sampleJson };
         const state = reducer(initialState, action);
         expect(state).toEqual({
             ...initialState,
-            centreCoordinates: newCoordinates,
+            geoJsonData: sampleJson,
         });
-        /*
-        await store.dispatch(updateCentreCoordinates(newCoordinates));
-        expect(store.getState().geoMap).toEqual({
-            canInduceMapMovements: true,
-            centreCoordinates: { lat: 0, lng: 0 },
-            northWestCoordinates: { lat: 0, lng: 0 },
-            northEastCoordinates: { lat: 0, lng: 0 },
-            southWestCoordinates: { lat: 0, lng: 0 },
-            southEastCoordinates: { lat: 0, lng: 0 },
-        });
-        */
-//let state = store.getState().geoMap;
-// mock dispatch event
-//await store.dispatch(updateCentreCoordinates(newCoordinates));
-//const actions = store.getActions();
-//expect(fetch).toBeCalledWith("geoMap/updateCentreCoordinates");
-//expect(postSpy).toBeCalledWith("geoMap/updateCentreCoordinates", newCoordinates);
-// Return the promise
+    });
+});
 /*
-        return store.dispatch(updateCentreCoordinates(newCoordinates)).then(() => {
-            const actions = store.getActions();
-            expect(actions[1].type).toEqual("geoMap/updateCentreCoordinates/fulfilled");
-        });
-        */
-//const state = store.getState().geoMap;
-//const centreCoordinates = state.centreCoordinates;
-// first lets check that what we wanted to update, worked successfully
-//expect(centreCoordinates.lat).toBe(0);
-//const action = { type: updateCentreCoordinates.fulfilled.type, payload: response.arg };
-//const updated_state = reducer(store.getState().geoMap, action);
-/*
-        const centreCoordinates = state.centreCoordinates;
-        // first lets check that what we wanted to update, worked successfully
-        expect(centreCoordinates.lat).toBe(0);
-        expect(centreCoordinates.lng).toBe(0);
-        */
-/*
-        // now lets check that nothing else was effected
-        const copyOfOrignalState = delete state.centreCoordinates;
-
-        copyOfOrignalState.centreCoordinates.lat = 0;
-        copyOfOrignalState.centreCoordinates.lng = 0;
-
-        expect(copyOfOrignalState).toBe(updated_state);
-        */
-//});
+  // next we need to test how the reducer handles a success message from the thunk
+        
+*/
