@@ -1,45 +1,10 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState, store } from "../app/store";
+import { RootState } from "../app/store";
 import osmtogeojson from "osmtogeojson";
-import { couldStartTrivia } from "typescript";
 
 export interface coordinates {
     lat: number;
     lng: number;
-}
-
-export interface IProperty {
-    boundary: string;
-    changeset: string;
-    id: string;
-    logainm: string;
-    name: string;
-    source: string;
-    timestamp: string;
-    type: string;
-    uid: string;
-    user: string;
-    version: string;
-}
-export interface IGeometry {
-    type: string;
-    coordinates: [number, number][] | [number, number][][] | [number, number][][][];
-}
-
-export interface IGeoJson {
-    type: string;
-    geometry: IGeometry;
-    bbox?: number[];
-    properties?: IProperty;
-}
-
-export class GeoJson implements IGeoJson {
-    constructor(
-        public type: string,
-        public geometry: IGeometry,
-        properties?: IProperty,
-        bbox?: number[]
-    ) {}
 }
 
 export interface GeoMapState {
@@ -49,13 +14,14 @@ export interface GeoMapState {
     northEastCoordinates: coordinates;
     southWestCoordinates: coordinates;
     southEastCoordinates: coordinates;
+    // forced to use an any here as typescript really struggles with the GeoJson types
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     geoJsonData: any;
 }
 
 export const initialState: GeoMapState = {
     canInduceMapMovements: true,
-    centreCoordinates: { lat: 52.366130473786406, lng: -9.729074740570002 },
+    centreCoordinates: { lat: 46.81914, lng: 9.62556 },
     northWestCoordinates: { lat: 0, lng: 0 },
     northEastCoordinates: { lat: 0, lng: 0 },
     southWestCoordinates: { lat: 0, lng: 0 },
@@ -66,14 +32,12 @@ export const initialState: GeoMapState = {
 
 export const fetchOpenStreetData = createAsyncThunk(
     "geoMap/fetchOpenStreetData",
-    async (args: null, { getState }) => {
+    async (_args: void, { getState }) => {
         const state = getState() as { geoMap: GeoMapState };
-
-        const left = state.geoMap.northWestCoordinates.lng.toFixed(12).toString();
-        const bottom = state.geoMap.southWestCoordinates.lat.toFixed(12).toString();
-        const right = state.geoMap.northEastCoordinates.lng.toFixed(12).toString();
-        const top = state.geoMap.northEastCoordinates.lat.toFixed(12).toString();
-
+        const left = state.geoMap.northWestCoordinates.lng.toString();
+        const bottom = state.geoMap.southWestCoordinates.lat.toString();
+        const right = state.geoMap.northEastCoordinates.lng.toString();
+        const top = state.geoMap.northEastCoordinates.lat.toString();
         const url =
             "https://www.openstreetmap.org/api/0.6/map?bbox=" +
             left +
@@ -85,13 +49,19 @@ export const fetchOpenStreetData = createAsyncThunk(
             top;
 
         const response = await fetch(url, {
-            // learn more about this API here: https://graphql-pokemon2.vercel.app/
             method: "GET",
         }).then((response) => {
             return response.text();
         });
 
-        return response;
+        if (
+            response !=
+            "You requested too many nodes (limit is 50000). Either request a smaller area, or use planet.osm"
+        ) {
+            const parsedOsmData = new DOMParser().parseFromString(response, "application/xml");
+            return osmtogeojson(parsedOsmData).features;
+        }
+        return [];
     }
 );
 
@@ -124,15 +94,7 @@ export const geoMapSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(fetchOpenStreetData.fulfilled, (GeoMapState, action) => {
-            //osmtogeojson(
-            if (
-                action.payload !=
-                "You requested too many nodes (limit is 50000). Either request a smaller area, or use planet.osm"
-            ) {
-                const parser = new DOMParser().parseFromString(action.payload, "application/xml");
-                const test = osmtogeojson(parser);
-                GeoMapState.geoJsonData = test.features;
-            }
+            GeoMapState.geoJsonData = action.payload;
         });
     },
 });

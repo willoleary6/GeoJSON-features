@@ -1,5 +1,5 @@
 .leaflet-map-container {
-    height: 40em;
+    height: 35em;
 }
 #crosshair {
     left: calc(50% - 10px);

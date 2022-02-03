@@ -6,12 +6,11 @@ export function GeoJsonDashboard(): JSX.Element {
         <>
             {/* Wrap it in a dummy jsx parent */}
             <div className="row">
-                <div className="col-lg-5 mt-3">
+                <div className="col-lg-4 mt-5"></div>
+                <div className="col-lg-4 mt-5">
                     <GeoMap />
                 </div>
-                <div className="col-lg-5 mt-3">
-                    <GeoJsonData />
-                </div>
+                <div className="col-lg-4 mt-5"></div>
             </div>
         </>
     );

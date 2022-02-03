@@ -1,5 +1,5 @@
 import React from "react";
-import { MapWidget } from ".";
+import { Map } from ".";
 import Enzyme, { mount, shallow } from "enzyme";
 import toJson from "enzyme-to-json";
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
@@ -32,7 +32,7 @@ describe("MapWidget render testing", () => {
         const wrapper = mount(
             <React.StrictMode>
                 <Provider store={store}>
-                    <MapWidget />
+                    <Map />
                 </Provider>
             </React.StrictMode>
         );

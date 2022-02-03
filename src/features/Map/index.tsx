@@ -1,5 +1,5 @@
 import { LatLngBounds } from "leaflet";
-import React, { useEffect } from "react";
+import React from "react";
 import { MapContainer, TileLayer, useMapEvents, useMap, GeoJSON } from "react-leaflet";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
@@ -16,16 +16,18 @@ import {
 import { CoordinateDisplay } from "./CoordinateDisplay";
 import { CoordinateInput } from "./CoordinateInput";
 import "./MapWidget.css";
-import osmtogeojson from "osmtogeojson";
 
-export const MapWidget = (): JSX.Element => {
+export const Map = (): JSX.Element => {
     const geoMapSlice = useAppSelector(selectGeoMap);
     const dispatch = useAppDispatch();
+
     const updateCornerCoordinates = (bounds: LatLngBounds) => {
+        // function thats in charge of updating the bounds of the map in the store
         const northEastCoordinates = bounds.getNorthEast();
         const southWestCoordinates = bounds.getSouthWest();
         const northWestCoordinates = bounds.getNorthWest();
         const southEastCoordinates = bounds.getSouthEast();
+        // reducers in the slice will catch these dispatches and update the store
         dispatch(
             updateNorthWestCoordinates({
                 lat: northWestCoordinates.lat,
@@ -52,7 +54,11 @@ export const MapWidget = (): JSX.Element => {
         );
     };
 
+    // aynchronous function to update the map once valid coordinates
     const searchForCoordinates = async (latitude: number, longitude: number) => {
+        // Awaits are needed here to ensure that the dispatch action trigger correctly,
+        // this does trigger a react warning but there is no other way for this process to work
+        // unless the slice exclusively uses thunks instead of dispatching to regular reducers
         await dispatch(enableReduxInducedMapMovements());
         await dispatch(
             updateCentreCoordinates({
@@ -61,20 +67,21 @@ export const MapWidget = (): JSX.Element => {
             })
         );
         await dispatch(disableReduxInducedMapMovements());
-        await dispatch(fetchOpenStreetData(null));
+        await dispatch(fetchOpenStreetData());
     };
-    const Markers = () => {
+
+    const MapEventHandlers = () => {
         useMapEvents({
             dragend() {
                 dispatch(enableReduxInducedMapMovements());
-
-                dispatch(fetchOpenStreetData(null));
+                dispatch(fetchOpenStreetData());
             },
             dragstart() {
+                // we want to disable any redux updates while moving around
                 dispatch(disableReduxInducedMapMovements());
             },
             zoomend() {
-                dispatch(fetchOpenStreetData(null));
+                dispatch(fetchOpenStreetData());
             },
 
             move(moveEvent) {
@@ -109,12 +116,10 @@ export const MapWidget = (): JSX.Element => {
                 <CoordinateDisplay
                     coordinates={geoMapSlice.northWestCoordinates}
                     displayClassName="latitude-value-container"
-                    coordinateRounding={5}
                 />
                 <CoordinateDisplay
                     coordinates={geoMapSlice.northEastCoordinates}
                     displayClassName="longitude-value-container"
-                    coordinateRounding={5}
                 />
             </div>
             <div id="map">
@@ -125,19 +130,17 @@ export const MapWidget = (): JSX.Element => {
                     scrollWheelZoom={false}
                     className="leaflet-map-container"
                     whenCreated={(map) => {
+                        // on load actions
                         updateCornerCoordinates(map.getBounds());
+                        dispatch(fetchOpenStreetData());
                     }}
                 >
-                    <Markers />
+                    <MapEventHandlers />
                     <TileLayer
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
-
-                    {geoMapSlice.geoJsonData.map((element: any, index: number) => {
-                        return <GeoJSON key={element + index} data={element} />;
-                    })}
-
+                    <RenderGeoJsonData />
                     <ChangeMapView
                         latitude={geoMapSlice.centreCoordinates.lat}
                         longitude={geoMapSlice.centreCoordinates.lng}
@@ -148,26 +151,24 @@ export const MapWidget = (): JSX.Element => {
                 <CoordinateDisplay
                     coordinates={geoMapSlice.southWestCoordinates}
                     displayClassName="latitude-value-container"
-                    coordinateRounding={5}
                 />
                 <CoordinateDisplay
                     coordinates={geoMapSlice.southEastCoordinates}
                     displayClassName="longitude-value-container"
-                    coordinateRounding={5}
                 />
             </div>
         </>
     );
 };
-/*
 
-import osmtogeojson from "osmtogeojson";
-console.log(osmtogeojson(parser));
-*/
 interface coordinateProps {
     latitude: number;
     longitude: number;
 }
+/*
+React does not allow for components to trigger a render of a parent 
+component if the code is stored within the parent itself, better to store it outside 
+*/
 const ChangeMapView = ({ latitude, longitude }: coordinateProps): JSX.Element => {
     const geoMapSlice = useAppSelector(selectGeoMap);
     const map = useMap();
@@ -181,4 +182,11 @@ const ChangeMapView = ({ latitude, longitude }: coordinateProps): JSX.Element =>
         map.panTo([latitude, longitude]);
     }
     return <></>;
+};
+
+const RenderGeoJsonData = (): JSX.Element => {
+    const geoMapSlice = useAppSelector(selectGeoMap);
+    return geoMapSlice.geoJsonData.map((element: any, index: number) => {
+        return <GeoJSON key={element + index} data={element} />;
+    });
 };
