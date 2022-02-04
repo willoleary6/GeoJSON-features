@@ -54,7 +54,6 @@ export const fetchOpenStreetData = createAsyncThunk(
                 if (!response.ok) {
                     throw Error(response.statusText);
                 }
-
                 return response.text();
             })
             .catch(() => {

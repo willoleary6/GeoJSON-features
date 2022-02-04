@@ -1,15 +1,8 @@
-# Typescript React-Redux Template
+# GeoJSON Map
 
-using https://github.com/airbnb/javascript/tree/master/react#naming style guide
-This is a template project that makes use of the Inspinia
-style template as a base with some modifications. It is built
-using TypeScript and React and was bootstrapped using Create React App.
-
-Two example pages are given, dashboard and charts. The dashboard is based off
-the [Inspinia Dashboard
-v2](http://webapplayers.com/inspinia_admin-v2.9.4/dashboard_2.html) and
-demonstrates many of the components available in the application. While the
-charts page demos a few example charts.
+This app will present a React-Leaflet map and will simulataniously query the https://www.openstreetmap.org/api/0.6/map api to
+gather geo graphical data initally stored in the osm format but subsequently converted to the GeoJSON format. Fresh data will be
+queried when the user either Zooms, Drags or Queries the UI.
 
 ## [React](https://reactjs.org/)
 
@@ -56,17 +49,6 @@ store. Note that the `useAppDispatch` and `useAppSelector` functions found in
 `/src/app/hooks` should be used in place of the standard Redux hooks for full
 type support.
 
-#### Useful links
-
--   [React TypeScript Cheat Sheet](https://react-typescript-cheatsheet.netlify.app/docs/basic/setup/)
-
-## [Create React App](https://github.com/facebook/create-react-app)
-
-This project was bootstrapped with [Create React
-App](https://github.com/facebook/create-react-app), using the
-[Redux](https://redux.js.org/) and [Redux
-Toolkit](https://redux-toolkit.js.org/) template.
-
 ### Available Scripts
 
 In the project directory, you can run:
@@ -101,10 +83,6 @@ In the project directory, you can run:
     However we understand that this tool wouldn’t be useful if you couldn’t
     customize it when you are ready for it.
 
-### Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
 ## Styling
 
 The template has multiple layers of CSS to provide styling for the application.
@@ -131,29 +109,6 @@ Additional styling is included in the form of [Font Awesome
 v4.7](https://fontawesome.com/v4.7/) which provides a nice set of icons and
 [Animate.css](https://animate.style/) which provide animations, both of which
 are used by Inspinia.
-
-## [React Bootstrap](https://react-bootstrap-v4.netlify.app/)
-
-React Bootstrap provides Bootstrap styled React components. Please note the
-[correct way](https://react-bootstrap-v4.netlify.app/getting-started/introduction#importing-components)
-of importing React Bootstrap components, this avoids packaging the entire
-library when building your application. Also note that you can use Bootstrap
-classes in standard JSX as well, React Bootstrap is mostly about convenience and
-reimplementing the Bootstrap JavaScript.
-
-## [Epic Spinners](https://epic-spinners.epicmax.co/)
-
-As the name would suggest Epic Spinners is a library of cool looking spinners.
-They are provided in the template through the
-[react-epic-spinners](https://github.com/bondz/react-epic-spinners) library. See
-the `EpicSpinner` component for example usage.
-
-## [React Router](https://reactrouter.com/web/guides/quick-start)
-
-React Router is used to provide URL routing for the application. All of the
-routes for the application should be setup in the `src\routes\routes.tsx` file
-and used throughout the application. For example the `SideNavbar` component uses
-this to generate navigation links.
 
 ## Linting
 
@@ -189,11 +144,3 @@ sets up the generic routing structure of the application.
 
 `src\img`, `src\style` and `src\inspinia` all contain various assets that are
 used throughout the application.
-
-## Charts
-
-At the moment we are using the
-[react-chartjs-2](https://github.com/reactchartjs/react-chartjs-2) library for
-charting. Shared style objects are available in `src\app\chartStyles.ts` these
-are based on the Inspinia theme. For example usage see
-`src\routes\charts\Charts.tsx`.
